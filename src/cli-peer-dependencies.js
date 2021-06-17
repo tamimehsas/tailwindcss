@@ -5,5 +5,5 @@ export function lazyAutoprefixer() {
 }
 
 export function lazyCssnano() {
-  return require('cssnano')
+  return require('cssnano-simple')
 }

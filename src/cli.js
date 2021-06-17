@@ -541,6 +541,10 @@ async function build() {
             return require('cssnano')
           } catch {}
 
+          try {
+            return require('cssnano-simple')
+          } catch {}
+
           return lazyCssnano()(options)
         })(),
     ].filter(Boolean)
@@ -625,6 +629,10 @@ async function build() {
           // Try to load a local `cssnano` version first
           try {
             return require('cssnano')
+          } catch {}
+
+          try {
+            return require('cssnano-simple')
           } catch {}
 
           return lazyCssnano()(options)
