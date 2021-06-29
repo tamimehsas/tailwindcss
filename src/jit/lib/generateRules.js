@@ -53,6 +53,7 @@ function applyPrefix(matches, context) {
 
   for (let match of matches) {
     let [meta] = match
+    if (meta.frozen) continue
     if (meta.options.respectPrefix) {
       let container = postcss.root({ nodes: [match[1].clone()] })
       container.walkRules((r) => {
@@ -72,6 +73,11 @@ function applyImportant(matches) {
   let result = []
 
   for (let [meta, rule] of matches) {
+    if (meta.frozen) {
+      result.push([meta, rule.clone()])
+      continue
+    }
+
     let container = postcss.root({ nodes: [rule.clone()] })
     container.walkRules((r) => {
       r.selector = updateAllClasses(r.selector, (className) => {
@@ -152,15 +158,15 @@ function applyVariant(variant, matches, context) {
   return []
 }
 
-function parseRules(rule, cache, options = {}) {
+function parseRules(rule, cache, options = {}, sort = {}) {
   // PostCSS node
   if (!isPlainObject(rule) && !Array.isArray(rule)) {
-    return [[rule], options]
+    return [[rule], options, sort]
   }
 
   // Tuple
   if (Array.isArray(rule)) {
-    return parseRules(rule[0], cache, rule[1])
+    return parseRules(rule[0], cache, rule[1], rule[2])
   }
 
   // Simple object
@@ -168,7 +174,7 @@ function parseRules(rule, cache, options = {}) {
     cache.set(rule, parseObjectStyles(rule))
   }
 
-  return [cache.get(rule), options]
+  return [cache.get(rule), options, sort]
 }
 
 function* resolveMatchedPlugins(classCandidate, context) {
@@ -232,9 +238,21 @@ function* resolveMatches(candidate, context) {
     for (let [sort, plugin] of plugins) {
       if (typeof plugin === 'function') {
         for (let ruleSet of [].concat(plugin(modifier, { candidate, variants }))) {
-          let [rules, options] = parseRules(ruleSet, context.postCssNodeCache)
+          let [rules, options, ruleSort] = parseRules(ruleSet, context.postCssNodeCache)
+          let mergedSorts = {
+            ...sort,
+            ...ruleSort,
+            options: {
+              ...sort.options,
+              ...ruleSort.options,
+            },
+          }
+
           for (let rule of rules) {
-            matches.push([{ ...sort, options: { ...sort.options, ...options } }, rule])
+            matches.push([
+              { ...mergedSorts, options: { ...mergedSorts.options, ...options } },
+              rule,
+            ])
           }
         }
       }

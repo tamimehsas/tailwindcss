@@ -1,12 +1,12 @@
-import { addBaseSelector } from './backdropFilter'
+import { baseRules } from './backdropFilter'
 
 export default function () {
-  return function ({ config, matchUtilities, theme, variants, memory }) {
+  return function ({ config, matchUtilities, theme, variants }) {
     matchUtilities(
       {
-        'backdrop-invert': (value, { selector }) => {
+        'backdrop-invert': (value, { includeBase }) => {
           if (config('mode') === 'jit') {
-            addBaseSelector(memory, selector)
+            includeBase(baseRules)
           }
 
           return {

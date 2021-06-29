@@ -1,12 +1,12 @@
-import { addBaseSelector } from './filter'
+import { baseRules } from './filter'
 
 export default function () {
-  return function ({ config, matchUtilities, theme, variants, memory }) {
+  return function ({ config, matchUtilities, theme, variants }) {
     if (config('mode') === 'jit') {
       matchUtilities(
         {
-          grayscale: (value, { selector }) => {
-            addBaseSelector(memory, selector)
+          grayscale: (value, { includeBase }) => {
+            includeBase(baseRules)
 
             return {
               '--tw-grayscale': `grayscale(${value})`,

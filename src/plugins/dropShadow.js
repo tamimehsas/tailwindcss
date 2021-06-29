@@ -1,14 +1,14 @@
 import _ from 'lodash'
 import nameClass from '../util/nameClass'
-import { addBaseSelector } from './filter'
+import { baseRules } from './filter'
 
 export default function () {
-  return function ({ config, matchUtilities, addUtilities, theme, variants, memory }) {
+  return function ({ config, matchUtilities, addUtilities, theme, variants }) {
     if (config('mode') === 'jit') {
       matchUtilities(
         {
-          'drop-shadow': (value, { selector }) => {
-            addBaseSelector(memory, selector)
+          'drop-shadow': (value, { includeBase }) => {
+            includeBase(baseRules)
 
             return {
               '--tw-drop-shadow': Array.isArray(value)

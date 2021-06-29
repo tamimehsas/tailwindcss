@@ -1,12 +1,12 @@
-import { addBaseSelector } from './filter'
+import { baseRules } from './filter'
 
 export default function () {
-  return function ({ config, matchUtilities, theme, variants, memory }) {
+  return function ({ config, matchUtilities, theme, variants }) {
     if (config('mode') === 'jit') {
       matchUtilities(
         {
-          blur: (value, { selector }) => {
-            addBaseSelector(memory, selector)
+          blur: (value, { includeBase }) => {
+            includeBase(baseRules)
 
             return {
               '--tw-blur': `blur(${value})`,

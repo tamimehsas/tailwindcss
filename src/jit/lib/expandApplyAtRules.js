@@ -92,6 +92,7 @@ function processApply(root, context) {
     for (let util of candidates) {
       applyCandidates.add(util)
     }
+
     applies.push(rule)
   })
 

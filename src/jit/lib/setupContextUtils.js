@@ -288,11 +288,36 @@ function buildPluginApi(tailwindConfig, context, { variantList, variantMap, offs
             return []
           }
 
+          let selector = buildElementSelector(candidate, variants)
+          let includedBaseRules = []
           let includedRules = []
           let ruleSets = []
             .concat(
               rule(value, {
-                selector: buildElementSelector(candidate, variants),
+                selector,
+                includeBase(baseRules) {
+                  let baseRoot = context.memory.get(baseRules)
+                  if (!baseRoot) {
+                    baseRoot = postcss.root()
+                    context.memory.set(baseRules, baseRoot)
+                  }
+
+                  includedBaseRules.push([
+                    baseRoot,
+                    {
+                      respectVariants: false,
+                      respectImportant: false,
+                      respectPrefix: false,
+                    },
+                    { sort: offsets.base, layer: 'base', frozen: true },
+                  ])
+
+                  if (baseRoot.nodes.length === 0) {
+                    baseRoot.append(parseObjectStyles({ [selector]: baseRules }))
+                  } else {
+                    baseRoot.nodes[0].selectors = [...baseRoot.nodes[0].selectors, selector]
+                  }
+                },
                 includeRules(rules) {
                   includedRules.push(...rules)
                 },
@@ -303,7 +328,7 @@ function buildPluginApi(tailwindConfig, context, { variantList, variantMap, offs
               [nameClass(identifier, modifier)]: declaration,
             }))
 
-          return [...includedRules, ...ruleSets]
+          return [...includedBaseRules, ...includedRules, ...ruleSets]
         }
 
         let withOffsets = [{ sort: offset, layer: 'utilities', options }, wrapped]

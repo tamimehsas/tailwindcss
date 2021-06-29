@@ -1,4 +1,4 @@
-import { addBaseSelector } from './transform'
+import { baseRules } from './transform'
 import createUtilityPlugin from '../util/createUtilityPlugin'
 
 export default function () {
@@ -13,8 +13,8 @@ export default function () {
           ],
         ],
         {
-          lolback(_value, { selector }) {
-            addBaseSelector(rest.memory, selector)
+          lolback(_value, { includeBase }) {
+            includeBase(baseRules)
           },
         }
       )({ config, ...rest })
