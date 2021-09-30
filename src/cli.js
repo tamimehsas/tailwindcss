@@ -464,7 +464,7 @@ async function build() {
     for (let file of files) {
       changedContent.push({
         content: fs.readFileSync(path.resolve(file), 'utf8'),
-        extension: path.extname(file),
+        extension: path.extname(file).slice(1),
       })
     }
 
@@ -726,7 +726,7 @@ async function build() {
         chain = chain.then(async () => {
           changedContent.push({
             content: fs.readFileSync(path.resolve(file), 'utf8'),
-            extension: path.extname(file),
+            extension: path.extname(file).slice(1),
           })
 
           await rebuild(config)
@@ -738,7 +738,7 @@ async function build() {
       chain = chain.then(async () => {
         changedContent.push({
           content: fs.readFileSync(path.resolve(file), 'utf8'),
-          extension: path.extname(file),
+          extension: path.extname(file).slice(1),
         })
 
         await rebuild(config)
